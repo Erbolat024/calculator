@@ -1,0 +1,154 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #eef4ff, #f9fbff);
+  color: #12223d;
+}
+
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.back-btn {
+  text-decoration: none;
+  background: white;
+  color: #3b6ff5;
+  padding: 12px 20px;
+  border-radius: 14px;
+  font-weight: 700;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+}
+
+.task-badge {
+  background: #3b6ff5;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 14px;
+  font-weight: 700;
+}
+
+.title-block {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.title-block h1 {
+  font-size: 40px;
+  margin-bottom: 10px;
+  color: #1e3a8a;
+}
+
+.title-block p {
+  font-size: 18px;
+  color: #5b6780;
+}
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  background: white;
+  padding: 16px;
+  border-radius: 18px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+.tool-btn,
+.clear-btn {
+  border: none;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tool-btn.active {
+  outline: 3px solid #1e3a8a;
+}
+
+.tool-btn.red {
+  background: #ffe3e3;
+  color: #c62828;
+}
+
+.tool-btn.blue {
+  background: #e3efff;
+  color: #1d4ed8;
+}
+
+.tool-btn.skin {
+  background: #f8e2d2;
+  color: #8a4b2a;
+}
+
+.tool-btn.eraser {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.clear-btn {
+  background: #111827;
+  color: white;
+}
+
+.size-label {
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.canvas-wrap {
+  position: relative;
+  width: fit-content;
+  margin: 0 auto;
+  background: white;
+  padding: 14px;
+  border-radius: 20px;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.08);
+}
+
+.canvas-wrap img {
+  display: block;
+  max-width: 100%;
+  width: 650px;
+  border-radius: 12px;
+}
+
+#paintCanvas {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  border-radius: 12px;
+  touch-action: none;
+}
+
+@media (max-width: 768px) {
+  .title-block h1 {
+    font-size: 30px;
+  }
+
+  .canvas-wrap img {
+    width: 100%;
+    max-width: 100%;
+  }
+}
