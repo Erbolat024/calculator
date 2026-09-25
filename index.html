@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Калькулятор рабочих часов смены</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f4f6f8;
+      min-height: 100vh;
+      padding: 24px;
+      color: #172033;
+    }
+
+    .app {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .header {
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+
+    .sub {
+      color: #6b7280;
+      line-height: 1.5;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 7px;
+      color: #374151;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid #d1d5db;
+      border-radius: 11px;
+      font-size: 15px;
+      background: #ffffff;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .section-title h2 {
+      font-size: 20px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 11px;
+      padding: 11px 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-light {
+      background: #eef2ff;
+      color: #1d4ed8;
+    }
+
+    .btn-danger {
+      background: #fff1f2;
+      color: #be123c;
+      padding: 10px 12px;
+    }
+
+    .entries {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .entry {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+      padding: 13px;
+      background: #f9fafb;
+      border: 1px solid #eceff3;
+      border-radius: 14px;
+    }
+
+    .entry-result {
+      height: 43px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 11px;
+      font-weight: 800;
+    }
+
+    .totals {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .role-total {
+      padding: 13px;
+      border-radius: 13px;
+      background: #f8fafc;
+      border: 1px solid #edf0f3;
+    }
+
+    .role-name {
+      font-size: 12px;
+      color: #6b7280;
+      margin-bottom: 5px;
+    }
+
+    .role-hours {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .footer-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding: 12px;
+      }
+
+      .grid,
+      .totals {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .entry {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .entry .role-field {
+        grid-column: 1 / -1;
+      }
+
+      .entry .delete-wrap {
+        grid-column: 1 / -1;
+      }
+
+      .btn-danger {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .grid,
+      .totals {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 25px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <div class="header">
+      <h1>Калькулятор рабочих часов смены</h1>
+
+      <div class="sub">
+        Расчет рабочего времени по позициям DLK, MR, LL, TR и NT.
+        Перерыв в рабочее время не входит.
+      </div>
+    </div>
+
+    <div class="card">
+
+      <div class="grid">
+
+        <div>
+          <label>Начало смены</label>
+          <input
+            type="time"
+            id="shiftStart"
+            value="18:00"
+          >
+        </div>
+
+        <div>
+          <label>Окончание смены</label>
+          <input
+            type="time"
+            id="shiftEnd"
+            value="03:00"
+          >
+        </div>
+
+        <div>
+          <label>Перерыв, минут</label>
+          <input
+            type="number"
+            id="breakMinutes"
+            value="30"
+            min="0"
+            step="5"
+          >
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="card">
+
+      <div class="section-title">
+
+        <div>
+          <h2>Интервалы работы внутри смены</h2>
+        </div>
+
+        <div class="footer-actions">
+
+          <button
+            class="btn btn-primary"
+            id="addEntry"
+          >
+            + Добавить интервал
+          </button>
+
+          <button
+            class="btn btn-light"
+            id="clearAll"
+          >
+            Очистить
+          </button>
+
+        </div>
+
+      </div>
+
+      <div
+        class="entries"
+        id="entries"
+      ></div>
+
+      <div class="totals">
+
+        <div class="role-total">
+          <div class="role-name">DLK</div>
+          <div
+            class="role-hours"
+            id="total-DLK"
+          >
+            0:00
+          </div>
+        </div>
+
+        <div class="role-total">
+          <div class="role-name">MR</div>
+          <div
+            class="role-hours"
+            id="total-MR"
+          >
+            0:00
+          </div>
+        </div>
+
+        <div class="role-total">
+          <div class="role-name">LL</div>
+          <div
+            class="role-hours"
+            id="total-LL"
+          >
+            0:00
+          </div>
+        </div>
+
+        <div class="role-total">
+          <div class="role-name">TR</div>
+          <div
+            class="role-hours"
+            id="total-TR"
+          >
+            0:00
+          </div>
+        </div>
+
+        <div class="role-total">
+          <div class="role-name">NT</div>
+          <div
+            class="role-hours"
+            id="total-NT"
+          >
+            0:00
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const roles = [
+      {
+        value: "DLK",
+        label: "DLK"
+      },
+      {
+        value: "MR",
+        label: "MR"
+      },
+      {
+        value: "LL",
+        label: "LL"
+      },
+      {
+        value: "TR",
+        label: "TR"
+      },
+      {
+        value: "NT",
+        label: "NT"
+      }
+    ];
+
+
+    function toMinutes(time) {
+
+      if (!time) {
+        return null;
+      }
+
+      const [hours, minutes] =
+        time
+          .split(":")
+          .map(Number);
+
+      return hours * 60 + minutes;
+    }
+
+
+    function diffMinutes(start, end) {
+
+      let startMinutes =
+        toMinutes(start);
+
+      let endMinutes =
+        toMinutes(end);
+
+      if (
+        startMinutes === null ||
+        endMinutes === null
+      ) {
+        return 0;
+      }
+
+      /*
+        Если смена переходит через 00:00
+
+        Например:
+        23:00 → 02:00
+      */
+
+      if (
+        endMinutes <
+        startMinutes
+      ) {
+        endMinutes += 1440;
+      }
+
+      return (
+        endMinutes -
+        startMinutes
+      );
+    }
+
+
+    function formatTime(minutes) {
+
+      minutes =
+        Math.max(
+          0,
+          Math.round(minutes)
+        );
+
+      const hours =
+        Math.floor(
+          minutes / 60
+        );
+
+      const mins =
+        minutes % 60;
+
+      return (
+        hours +
+        ":" +
+        String(mins)
+          .padStart(2, "0")
+      );
+    }
+
+
+    function decimalHours(minutes) {
+
+      return (
+        minutes / 60
+      )
+        .toFixed(2)
+        .replace(".", ",");
+    }
+
+
+    function createEntry(
+      role = "DLK",
+      start = "",
+      end = ""
+    ) {
+
+      const entry =
+        document.createElement("div");
+
+      entry.className = "entry";
+
+
+      entry.innerHTML = `
+
+        <div class="role-field">
+
+          <label>
+            Позиция
+          </label>
+
+          <select class="role">
+
+            ${
+              roles
+                .map(
+                  roleItem =>
+                    `
+                    <option
+                      value="${roleItem.value}"
+                      ${
+                        roleItem.value === role
+                          ? "selected"
+                          : ""
+                      }
+                    >
+                      ${roleItem.label}
+                    </option>
+                    `
+                )
+                .join("")
+            }
+
+          </select>
+
+        </div>
+
+
+        <div>
+
+          <label>
+            Начало
+          </label>
+
+          <input
+            type="time"
+            class="start"
+            value="${start}"
+          >
+
+        </div>
+
+
+        <div>
+
+          <label>
+            Конец
+          </label>
+
+          <input
+            type="time"
+            class="end"
+            value="${end}"
+          >
+
+        </div>
+
+
+        <div>
+
+          <label>
+            Итого
+          </label>
+
+          <div
+            class="entry-result"
+          >
+            0:00
+          </div>
+
+        </div>
+
+
+        <div class="delete-wrap">
+
+          <button
+            class="btn btn-danger delete"
+          >
+            Удалить
+          </button>
+
+        </div>
+
+      `;
+
+
+      entry
+        .querySelectorAll(
+          "input, select"
+        )
+        .forEach(
+          element => {
+
+            element
+              .addEventListener(
+                "input",
+                recalculate
+              );
+
+          }
+        );
+
+
+      entry
+        .querySelector(
+          ".delete"
+        )
+        .addEventListener(
+          "click",
+          () => {
+
+            entry.remove();
+
+            recalculate();
+
+          }
+        );
+
+
+      document
+        .getElementById(
+          "entries"
+        )
+        .appendChild(
+          entry
+        );
+
+
+      recalculate();
+    }
+
+
+    function recalculate() {
+
+      /*
+        Общая продолжительность смены
+      */
+
+      const grossShift =
+        diffMinutes(
+          document
+            .getElementById(
+              "shiftStart"
+            )
+            .value,
+
+          document
+            .getElementById(
+              "shiftEnd"
+            )
+            .value
+        );
+
+
+      /*
+        Перерыв
+      */
+
+      const breakMinutes =
+        Math.max(
+          0,
+
+          Number(
+            document
+              .getElementById(
+                "breakMinutes"
+              )
+              .value
+          ) || 0
+        );
+
+
+      /*
+        Чистое рабочее время
+
+        Сейчас используется для внутреннего расчета.
+      */
+
+      const netShift =
+        Math.max(
+          0,
+          grossShift -
+          breakMinutes
+        );
+
+
+      /*
+        Сумма часов
+        по каждой позиции
+      */
+
+      const totals = {
+
+        DLK: 0,
+
+        MR: 0,
+
+        LL: 0,
+
+        TR: 0,
+
+        NT: 0
+
+      };
+
+
+      /*
+        Перебираем все интервалы
+      */
+
+      document
+        .querySelectorAll(
+          ".entry"
+        )
+        .forEach(
+          row => {
+
+            const start =
+              row
+                .querySelector(
+                  ".start"
+                )
+                .value;
+
+
+            const end =
+              row
+                .querySelector(
+                  ".end"
+                )
+                .value;
+
+
+            const minutes =
+              diffMinutes(
+                start,
+                end
+              );
+
+
+            /*
+              Показываем результат
+
+              Например:
+
+              2:30 (2,50 ч)
+            */
+
+            row
+              .querySelector(
+                ".entry-result"
+              )
+              .textContent =
+                formatTime(minutes) +
+                " (" +
+                decimalHours(minutes) +
+                " ч)";
+
+
+            /*
+              Какая позиция
+              выбрана
+            */
+
+            const role =
+              row
+                .querySelector(
+                  ".role"
+                )
+                .value;
+
+
+            /*
+              Добавляем время
+              к позиции
+            */
+
+            totals[role] +=
+              minutes;
+
+          }
+        );
+
+
+      /*
+        Вывод итогов
+      */
+
+      Object
+        .keys(totals)
+        .forEach(
+          role => {
+
+            const element =
+              document
+                .getElementById(
+                  "total-" +
+                  role
+                );
+
+
+            if (element) {
+
+              element
+                .textContent =
+                  formatTime(
+                    totals[role]
+                  );
+
+            }
+
+          }
+        );
+
+
+      /*
+        netShift оставлен
+        для будущих расчетов
+      */
+
+      console.log(
+        "Чистое время смены:",
+        formatTime(netShift)
+      );
+    }
+
+
+    /*
+      Добавить интервал
+    */
+
+    document
+      .getElementById(
+        "addEntry"
+      )
+      .addEventListener(
+        "click",
+        () => {
+
+          createEntry();
+
+        }
+      );
+
+
+    /*
+      Пересчет при изменении смены
+    */
+
+    document
+      .getElementById(
+        "shiftStart"
+      )
+      .addEventListener(
+        "input",
+        recalculate
+      );
+
+
+    document
+      .getElementById(
+        "shiftEnd"
+      )
+      .addEventListener(
+        "input",
+        recalculate
+      );
+
+
+    document
+      .getElementById(
+        "breakMinutes"
+      )
+      .addEventListener(
+        "input",
+        recalculate
+      );
+
+
+    /*
+      Очистить все интервалы
+    */
+
+    document
+      .getElementById(
+        "clearAll"
+      )
+      .addEventListener(
+        "click",
+        () => {
+
+          document
+            .getElementById(
+              "entries"
+            )
+            .innerHTML = "";
+
+
+          createEntry();
+
+          recalculate();
+
+        }
+      );
+
+
+    /*
+      Стартовые интервалы
+
+      Если не нужны —
+      эти строки можно удалить.
+    */
+
+    createEntry(
+      "DLK",
+      "18:00",
+      "20:30"
+    );
+
+  </script>
+
+</body>
+</html>
